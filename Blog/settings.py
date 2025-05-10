@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+
 from starlette.config import Config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,8 +32,12 @@ SECRET_KEY = env_config_file.get("SECRET_KEY", cast=str)
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env_config_file.get("DEBUG", cast=bool, default=False)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
+ALLOWED_ORIGINS = ['http://127.0.0.1:81', 'http://localhost:81']
+CSRF_TRUSTED_ORIGINS = ALLOWED_ORIGINS.copy()
+SESSION_COOKIE_SECURE = env_config_file.get('SESSION_COOKIE_SECURE', cast=bool , default=True)
+CSRF_COOKIE_SECURE = env_config_file.get('CSRF_COOKIE_SECURE', cast=bool , default=True)
 
 # Application definition
 
@@ -80,9 +85,13 @@ WSGI_APPLICATION = "Blog.wsgi.application"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'HOST': env_config_file.get("DATABASE_HOST",cast=str),
+        'PORT': env_config_file.get("DATABASE_PORT",cast=int),
+        'USER': env_config_file.get("DATABASE_USER",cast=str),
+        'PASSWORD': env_config_file.get("DATABASE_PASS",cast=str),
+        'NAME': env_config_file.get("DATABASE_NAME",cast=str), 
     }
 }
 
@@ -118,10 +127,16 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "static/"
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/3.2/howto/static-files/
+
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'static'
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
