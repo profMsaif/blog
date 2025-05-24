@@ -38,6 +38,20 @@ services:
         - 81:80
       depends_on:
         - api
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  worker:
+    build: .
+    command: celery -A Blog worker --loglevel=info
+    depends_on:
+      - redis
+      - db
+    volumes:
+      - ./:/app
+
 
 volumes:
   db-data:
