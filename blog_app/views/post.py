@@ -3,7 +3,7 @@ from django.views import generic
 
 from blog_app.forms import CommentForm
 from blog_app.models import Post
-
+from blog_app.tasks import email_tasks
 
 class PostList(generic.ListView):
     queryset = Post.objects.filter(status=1).order_by("-created_on")
@@ -16,6 +16,7 @@ class PostList(generic.ListView):
 
 
 def post_detail(request, slug):
+    email_tasks.send_welcome_email("all user")
     template_name = "blog_app/post_detail.html"
     post = get_object_or_404(Post, slug=slug)
     comments = post.comments.filter(active=True)
